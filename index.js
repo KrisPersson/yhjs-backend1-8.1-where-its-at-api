@@ -11,36 +11,6 @@ const { ticketsRouter } = require('./routes/tickets')
 const { userRouter } = require('./routes/user')
 
 
-
-const { events } = require('./events.json')
-
-
-// function createTickets(eventId, amountOfTickets) {
-//     const tickets = []
-//     for (let i = 0; i < amountOfTickets; i++) {
-//         tickets.push({
-//             eventId: eventId,
-//             ticketId: i + 1,
-//             redeemed: ""
-//         })
-//     }
-//     return tickets
-// }
-
-
-// async function insert(eventId, amountOfTickets) {
-//     const tickets = createTickets(eventId, amountOfTickets)
-//     await ticketsDb.insert({ eventId: eventId, tickets: tickets })
-// }
-
-// insert(1, 250)
-// insert(2, 3)
-// insert(3, 120)
-// insert(4, 200)
-
-
-
-
 app.use('/api/events', eventsRouter)
 app.use('/api/tickets', ticketsRouter)
 app.use('/api/user', userRouter)

@@ -1,5 +1,6 @@
 const { getSpecificTicket, verifyTicket, purchaseTicket } = require('../models/tickets.model')
 const { getEvent } = require('../utils')
+const moment = require('moment')
 
 
 async function getSpecificTicketCtrl(request, response) {
@@ -26,7 +27,7 @@ async function purchaseTicketCtrl(request, response) {
     const { eventId, requestedAmountOfTickets, apiKey } = request.body
     try {
         const purchasedTickets = await purchaseTicket(eventId, requestedAmountOfTickets, apiKey)
-        response.json({ success: true, purchasedTickets, event: getEvent(eventId) })
+        response.json({ success: true, datePurchased: moment().format(), purchasedTickets, event: getEvent(eventId) })
     } catch (error) {
         response.json({ success: false, message: error.message })
     }

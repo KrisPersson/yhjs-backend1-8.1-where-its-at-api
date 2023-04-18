@@ -22,7 +22,6 @@ async function getSpecificTicket(eventId, ticketId) {
 
 async function verifyTicket(apiKey, ticketId, eventId) {
     const apiKeyIsAMatch = await apiKeysDb.find({ apiKey: apiKey })
-    console.log(apiKeyIsAMatch)
     if (apiKeyIsAMatch.length < 1) {
         throw new Error('No matching API-key')
     }

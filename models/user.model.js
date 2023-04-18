@@ -1,5 +1,6 @@
 const { nanoid } = require('nanoid')
 const { userDb, apiKeysDb } = require('../db')
+const { hashPassword, comparePassword } = require('../bcrypt')
 
 async function registerNewUser(username, password) {
 
@@ -7,29 +8,34 @@ async function registerNewUser(username, password) {
     if (userNameAlreadyExists) {
         throw new Error('Username already exists')
     }
+
+    const hashedPassword = await hashPassword(password)
+
     const newUser = {
         username: username,
-        password: password,
+        password: hashedPassword,
+        id: nanoid(),
         apiKey: nanoid()
     }
     const addedUser = await userDb.insert(newUser)
-    console.log(addedUser)
     if (!addedUser) {
-        throw new Error('Failed to add user in database')
+        throw new Error('Failed to add user in database - contact system administrator')
     }
     await apiKeysDb.insert({ apiKey: newUser.apiKey })
-    return { username: addedUser.username, apiKey: addedUser.apiKey }
+    return { username: addedUser.username, apiKey: addedUser.apiKey, id: addedUser.id }
 }
 
 async function userLogin(username, password) {
     const user = await userDb.findOne({ username })
     if (!user) {
-        throw new Error('Username not found')
+        throw new Error('Wrong username and/or password')
     }
-    if (password !== user.password) {
-        throw new Error('Wrong password')
+    const passwordIsAMatch = await comparePassword(password, user.password)
+    if (!passwordIsAMatch) {
+        throw new Error('Wrong username and/or password')
     }
-    return { username: user.username, apiKey: user.apiKey }
+
+    return { username: user.username, apiKey: user.apiKey, id: user.id }
 }
 
 module.exports = { registerNewUser, userLogin }

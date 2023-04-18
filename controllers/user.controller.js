@@ -1,4 +1,7 @@
 const { registerNewUser, userLogin } = require('../models/user.model')
+const jwt = require('jsonwebtoken')
+const { secret } = require('../bcrypt')
+
 
 async function userRegisterCtrl(request, response) {
 
@@ -21,15 +24,28 @@ async function userLoginCtrl(request, response) {
 
     try {
         const user = await userLogin(username, password)
+        const token = jwt.sign({ id: user.id }, secret, { expiresIn: 100 } )
         response.json({ 
             success: true,
             message: `Successfully logged in as ${user.username}!`, 
             username: user.username, 
-            apiKey: user.apiKey 
+            apiKey: user.apiKey,
+            token: token 
         })
     } catch (error) {
         response.json({ success: false, message: error.message })
     }
 }
 
-module.exports = { userRegisterCtrl, userLoginCtrl }
+async function verifyTokenCtrl(request, response) {
+    const token = request.headers.authorization.replace('Bearer ', '')
+
+    try {
+        const data = jwt.verify(token, secret)
+        response.json({ success: true, message: 'Token valid' })
+    } catch (error) {
+        response.json({ success: false, message: 'Invalid token' })
+    }
+}
+
+module.exports = { userRegisterCtrl, userLoginCtrl, verifyTokenCtrl}
